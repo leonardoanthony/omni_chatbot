@@ -6,6 +6,7 @@ import { qrcode } from './src/modules/qrcode/index.js';
 import { init } from './seed.js';
 import { brapi } from './src/modules/brapi/index.js';
 import { slotmachine } from './src/modules/slotmachine/index.js';
+import { pokemon } from './src/modules/pokemon/index.js';
 
 // init();
 
@@ -36,12 +37,12 @@ function start(client) {
     if (message.body === '!help') {
       await client.sendText(message.from, `
       *Principais Comandos:*
-Pai Aldo
-!cep {cep apenas números}
 
-!qrcode {texto, link, etc...}
+!cep _cep apenas números_
 
-!cota {sigla}
+!qrcode _texto, link, etc..._
+
+!cota _sigla_
 
 `);
     }
@@ -71,8 +72,20 @@ Pai Aldo
   });
 
   client.onMessage(async message => {
+    if (message.body.slice(0,8) === '!pokemon') {
+      const {image, id, name} = await pokemon();
+      await client.sendImage(message.from, image, `${id}.png`, name)
+      fs.unlink(image, () => {});
+    }
+  });
+
+  client.onMessage(async message => {
     if (message.body.slice(0,5) === '!cota') {
       const cota = message.body.slice(6).trim().toUpperCase();
+      if(cota == ''){
+        await client.sendText(message.from, 'Preencha uma cota, exemplo: PETR4, ITSA4');
+        return;
+      }
       const response = await brapi(cota);
       await client.sendText(message.from, response);
     }
