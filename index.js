@@ -74,7 +74,7 @@ function start(client) {
   client.onMessage(async message => {
     if (message.body.slice(0,8) === '!pokemon') {
       const {image, id, name} = await pokemon();
-      await client.sendImage(message.from, image, `${id}.png`, name)
+      await client.sendImage(message.from, image, `${id}.png`, `#${id} - ${name}`)
       fs.unlink(image, () => {});
     }
   });
