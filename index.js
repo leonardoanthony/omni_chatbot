@@ -4,6 +4,7 @@ import path from 'path';
 import { cepapi } from './src/modules/cepapi/index.js';
 import { qrcode } from './src/modules/qrcode/index.js';
 import { init } from './seed.js';
+import { brapi } from './src/modules/brapi/index.js';
 
 // init();
 
@@ -30,6 +31,17 @@ function start(client) {
     }
   });
 
+  client.onMessage(async message => {
+    if (message.body === '!help') {
+      await client.sendText(message.from, `
+      *Principais Comandos:*
+Pai Aldo
+!cep {cep apenas números}
+!qrcode {texto, link, etc...}`);
+    }
+  });
+
+
 
   client.onMessage(async message => {
     if (message.body.slice(0,4) === '!cep' && message.body.length == 13) {
@@ -49,6 +61,14 @@ function start(client) {
       const filePath = await qrcode(info);
       await client.sendImage(message.from, filePath, 'qrcode.png', 'Gerado com sucesso')
       fs.unlink(filePath, () => {});
+    }
+  });
+
+  client.onMessage(async message => {
+    if (message.body.slice(0,5) === '!cota') {
+      const cota = message.body.slice(6).trim().toUpperCase();
+      const response = await brapi(cota);
+      await client.sendText(message.from, response);
     }
   });
 
