@@ -44,6 +44,8 @@ function start(client) {
 
 !cota _sigla_
 
+!pokemon
+
 `);
     }
   });
@@ -65,16 +67,28 @@ function start(client) {
   client.onMessage(async message => {
     if (message.body.slice(0,7) === '!qrcode') {
       const info = message.body.slice(8).trim();
+      
       const filePath = await qrcode(info);
-      await client.sendImage(message.from, filePath, 'qrcode.png', 'Gerado com sucesso')
+      const senderNumber = message.author;
+      const mention = `@${senderNumber.split('@')[0]}`;
+      await client.sendImage(message.from, filePath, 'qrcode.png', `Gerado com sucesso ${mention}`)
+      
       fs.unlink(filePath, () => {});
     }
   });
 
   client.onMessage(async message => {
-    if (message.body.slice(0,8) === '!pokemon') {
+    if (message.body === '!pokemon' || message.body === '!pokémon') {
+      
+      const senderNumber = message.author;
+      const mention = `@${senderNumber.split('@')[0]}`;
+
+      
+
       const {image, id, name} = await pokemon();
-      await client.sendImage(message.from, image, `${id}.png`, `#${id} - ${name}`)
+      await client.sendImage(message.from, image, `${id}.png`, `#${id} - ${name} ${mention}`);
+
+      
       fs.unlink(image, () => {});
     }
   });
