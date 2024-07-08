@@ -2,8 +2,8 @@ export const brapi = async (cota) => {
     const url = `https://brapi.dev/api/quote/${cota.toUpperCase()}?token=ghqDkwLSVVnVhCcUCAnywe`;
     const response = await (await fetch(url)).json();
 
-    if(!response){
-        return `#404 - Not Found`;
+    if(response.error){
+        return response.message;
     }
 
     const {longName, symbol, regularMarketPrice} = response.results[0];

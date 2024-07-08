@@ -37,7 +37,12 @@ function start(client) {
       *Principais Comandos:*
 Pai Aldo
 !cep {cep apenas números}
-!qrcode {texto, link, etc...}`);
+
+!qrcode {texto, link, etc...}
+
+!cota {sigla}
+
+`);
     }
   });
 

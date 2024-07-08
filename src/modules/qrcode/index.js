@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 
 export async function qrcode(message) {
   const url = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(message)}`;
-  console.log('url',url);
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Failed to fetch the image. Status: ${response.status}`);
 
