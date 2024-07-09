@@ -1,28 +1,24 @@
 import { UserRepository } from "../repository/UserRepository.js";
 
 export class User {
-    id;
-    name;
-    mention; //`@${message.author.split('@')[0]}`
-    coins;
-    isAdmin;
+    constructor(message){
+        this.id = message.from;
+        this.name = message.body.slice(7).trim();
+        this.mention = `@${message.author.split('@')[0]}`;
+        
 
-    constructor(id, name, mention){
-        this.id = id;
-        this.name = name;
-        this.mention = mention;
-        this.coins = 0;
-        this.isAdmin = false;
+        this._repository = new UserRepository();
     }
 
-    create(){
-        console.log(this);
+    async create(){
+        this.coins = 0;
+        this.isAdmin = false;
+        await this._repository.create(this);
+    }
+
+    async findById(){
+        return await this._repository.findById(this.id);
     }
 }
 
-
-const user = new User('aaa', 'Leo', 'leooo');
-user.create();
-
-new UserRepository().create(user);
 

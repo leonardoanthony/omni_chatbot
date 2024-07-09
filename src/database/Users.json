@@ -1,16 +1,9 @@
 [
   {
-    "id": "aaa",
-    "name": "Leo",
-    "mention": "leooo",
-    "coins": 0,
-    "isAdmin": false
-  },
-  {
-    "id": "aaa",
-    "name": "Leo",
-    "mention": "leooo",
-    "coins": 0,
-    "isAdmin": false
+    "id": "558198644927@c.us",
+    "name": "Leonardo",
+    "mention": "@558198644927",
+    "coins": 1000000000,
+    "isAdmin": true
   }
 ]

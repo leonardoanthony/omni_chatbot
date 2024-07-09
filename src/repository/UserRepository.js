@@ -12,9 +12,14 @@ export class UserRepository {
 
     async create(user){
         const data = JSON.parse(await readFile(this._tableName));
-        console.log(data);
         data.push(user);
         await writeFile(this._tableName, JSON.stringify(data));
 
+    }
+
+    async findById(id){
+        const data = Array.from(JSON.parse(await readFile(this._tableName)));
+        const user = data.find(user => user.id = id);
+        return user;
     }
 }

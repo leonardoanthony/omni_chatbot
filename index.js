@@ -6,27 +6,28 @@ import { qrcode } from './src/modules/qrcode/index.js';
 import { brapi } from './src/modules/brapi/index.js';
 import { slotmachine } from './src/modules/slotmachine/index.js';
 import { pokemon } from './src/modules/pokemon/index.js';
+import startConfigOptions from './src/config/startConfigOptions.js';
+import parseCommand from './src/config/parser/index.js';
+import { reactions } from './src/config/reactions.js';
 
-
-
-
-create({
-  sessionId: "!Robot",
-  multiDevice: true, //required to enable multiDevice support
-  authTimeout: 60, //wait only 60 seconds to get a connection with the host account device
-  blockCrashLogs: true,
-  disableSpins: true,
-  headless: true,
-  hostNotificationLang: 'PT_BR',
-  logConsole: false,
-  popup: true,
-  qrTimeout: 0, //0 means it will wait forever for you to scan the qr code
-}).then(client => start(client));
+create(startConfigOptions()).then(client => start(client));
 
 function start(client) {
 
+
+  const handleMsg = (msgText, message) => {
+      const parsedMessage = parseCommand(msgText);
+      if(parsedMessage.valid){
+
+      }
+  }
+
+
+
+
   client.onMessage(async message => {
     if (message.body === 'Pai Aldo') {
+      client.react(message.id, '✋');
       await client.sendText(message.from, '✋😞');
     }
   });
@@ -34,16 +35,54 @@ function start(client) {
   
   client.onMessage(async message => {
     if (message.body === '!help') {
-      await client.sendText(message.from, `
-      *Principais Comandos:*
+      await client.sendText(message.from, 
+`______
 
-!cep _cep apenas números_
+--- !Robot ----
+Todos os comandos começam com *!*
+Seguido do comando e por fim os parametros, quando necessário
+_Exemplos_: 
+\`!cep 00100100\`
+\`!pokemon\`
+\`!comando parametroOpcional\`
 
-!qrcode _texto, link, etc..._
+______
 
-!cota _sigla_
+--- CEP ----
+Saiba o endereço a partir do cep
+_Exemplo_: 
+\`!cep 00100100\`
 
-!pokemon
+______
+
+--- COTA ----
+Saiba a cotação de uma ação do mercado financeiro
+_Exemplo_: 
+\`!cota petr4\`
+
+______
+
+--- QRCODE ----
+Gere um QRCode a partir de um texto ou link
+_Exemplo_: 
+\`!qrcode meu texto\`
+\`!qrcode http://meulink.com\`
+
+______
+
+--- POKEMON ----
+Gere um Pokémon aleatório
+_Exemplo_: 
+\`!pokemon\`
+
+______
+
+--- CAÇA NÍQUEIS ----
+Jogue o famoso caça níqueis, se der 3 números iguais, você vence;
+_Exemplo_: 
+\`🎰\`
+
+______
 
 `);
     }
@@ -53,12 +92,25 @@ function start(client) {
 
   client.onMessage(async message => {
     if (message.body.slice(0,4) === '!cep' && message.body.length == 13) {
+
+
+      await client.react(message.id, reactions.loading)
+
       const cep = Number(message.body.slice(5));
       if(isNaN(cep)){
         await client.sendText(message.from, 'Apenas números');
         return;
       }
       const endereco = await cepapi(cep);
+
+      if(endereco.erro){
+        await client.react(message.id, reactions.error)
+        await client.sendText(message.from, 'endereco');
+        return;
+      }
+      
+      
+      await client.react(message.id, reactions.success)
       await client.sendText(message.from, endereco);
     }
   });
@@ -66,6 +118,12 @@ function start(client) {
   client.onMessage(async message => {
     if (message.body.slice(0,7) === '!qrcode') {
       const info = message.body.slice(8).trim();
+
+      if(!info){
+        await client.react(message.id, '❌');
+        await client.sendText(message.from, 'comando !qrcode sem parametro');
+        return;
+      }
       
       const filePath = await qrcode(info);
       const senderNumber = message.author;
