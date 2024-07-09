@@ -3,12 +3,10 @@ import fs from 'fs';
 import path from 'path';
 import { cepapi } from './src/modules/cepapi/index.js';
 import { qrcode } from './src/modules/qrcode/index.js';
-import { init } from './seed.js';
 import { brapi } from './src/modules/brapi/index.js';
 import { slotmachine } from './src/modules/slotmachine/index.js';
 import { pokemon } from './src/modules/pokemon/index.js';
 
-// init();
 
 
 
@@ -33,6 +31,7 @@ function start(client) {
     }
   });
 
+  
   client.onMessage(async message => {
     if (message.body === '!help') {
       await client.sendText(message.from, `

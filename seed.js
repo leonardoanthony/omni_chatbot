@@ -52,3 +52,5 @@ export const init = () => {
         removerDiretorioRecursivo(nomePasta);
 
 }
+
+init();
