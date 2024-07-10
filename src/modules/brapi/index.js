@@ -3,18 +3,26 @@ export const brapi = async (cota) => {
     const url = `https://brapi.dev/api/quote/${quote}?token=ghqDkwLSVVnVhCcUCAnywe`;
     const response = await (await fetch(url)).json();
 
-    if(response.error || response.results[0].priceEarnings == null){
+    
+    if(response.error){
         return `Não encontramos a ação ${quote}`;
     }
 
+
+    
     const {longName, symbol, regularMarketPrice} = response.results[0];
 
-    const preco = regularMarketPrice.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
-
-    return `
-*${symbol}:* 
-*Empresa:* ${longName}
-*Preço:* ${preco}
+    if(longName && symbol && regularMarketPrice){
+        const preco = regularMarketPrice.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+    
+        return `
+    *${symbol}:* 
+    *Empresa:* ${longName}
+    *Preço:* ${preco}
     `
+    }else{
+        return `Não encontramos a ação ${quote}`;
+    }
+
 }
 
