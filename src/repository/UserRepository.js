@@ -2,7 +2,7 @@
 import { collection, doc, getDoc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../config/firebase/firebase.js';
 
-class UserRepository {
+export class UserRepository {
   constructor() {
     this.collection = collection(db, 'users');
   }
@@ -11,9 +11,10 @@ class UserRepository {
     try {
       const userDoc = doc(this.collection, user.id);
       await setDoc(userDoc, user);
-      console.log('User created successfully');
+      return true;
     } catch (error) {
       console.error('Error creating user:', error);
+      return false;
     }
   }
 
