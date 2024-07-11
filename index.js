@@ -27,16 +27,21 @@ function start(client) {
   }
 
   client.onMessage(async message => {
-    if (message.body.slice(0,7) === '!create') {
-      client.react(message.id, reactions.loading);
-      const controller =  new UserController();
-      const result = await controller.createUser(message);
-      if(result){
-        client.react(message.id, reactions.success);
-        await client.reply(message.from, 'Usuário cadastrado');
-      }else{
-        client.react(message.id, reactions.error);
-        await client.reply(message.from, 'Erro ao cadatrar');
+    if (message.body.slice(0, 7) === '!create') {
+      if (message.isGroupMsg) {
+        await client.react(message.id, reactions.error);
+        await client.sendText(message.from, 'Usuários só podem ser cadastrados em um chat privado');
+      } else {
+        client.react(message.id, reactions.loading);
+        const controller = new UserController();
+        const result = await controller.createUser(message);
+        if (result) {
+          await client.react(message.id, reactions.success);
+          await client.sendText(message.from, 'Usuário cadastrado');
+        } else {
+          await client.react(message.id, reactions.error);
+          await client.sendText(message.from, 'Erro ao cadastrar');
+        }
       }
     }
   });
