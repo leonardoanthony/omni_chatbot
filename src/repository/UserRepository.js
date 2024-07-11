@@ -1,25 +1,68 @@
-import {readFile, writeFile} from 'fs/promises'
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-export class UserRepository {
+import { collection, doc, getDoc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '../config/firebase/firebase.js';
 
-    constructor(){
-        const __filename = fileURLToPath(import.meta.url);
-        const __dirname = path.dirname(__filename);
-        this._tableName = path.join(__dirname, '../database/Users.json');
+class UserRepository {
+  constructor() {
+    this.collection = collection(db, 'users');
+  }
+
+  async createUser(user) {
+    try {
+      const userDoc = doc(this.collection, user.id);
+      await setDoc(userDoc, user);
+      console.log('User created successfully');
+    } catch (error) {
+      console.error('Error creating user:', error);
     }
+  }
 
-    async create(user){
-        const data = JSON.parse(await readFile(this._tableName));
-        data.push(user);
-        await writeFile(this._tableName, JSON.stringify(data));
-
+  async readUser(id) {
+    try {
+      const userDoc = doc(this.collection, id);
+      const userSnap = await getDoc(userDoc);
+      if (userSnap.exists()) {
+        return userSnap.data();
+      } else {
+        console.log('No such user!');
+      }
+    } catch (error) {
+      console.error('Error reading user:', error);
     }
+  }
 
-    async findById(id){
-        const data = Array.from(JSON.parse(await readFile(this._tableName)));
-        const user = data.find(user => user.id = id);
-        return user;
+  async updateUser(id, updatedFields) {
+    try {
+      const userDoc = doc(this.collection, id);
+      await updateDoc(userDoc, updatedFields);
+      console.log('User updated successfully');
+    } catch (error) {
+      console.error('Error updating user:', error);
     }
+  }
+
+  async deleteUser(id) {
+    try {
+      const userDoc = doc(this.collection, id);
+      await deleteDoc(userDoc);
+      console.log('User deleted successfully');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  }
 }
+
+// Uso da classe UserRepository
+// const userRepository = new UserRepository();
+
+// Criar um novo usuário
+// userRepository.createUser(newUser);
+
+// // Ler um usuário
+// userRepository.readUser('81998644927').then(user => console.log(user));
+
+// // Atualizar um usuário
+// userRepository.updateUser('81998644927', { coins: 100, profile: 'admin' });
+
+// // Deletar um usuário
+// userRepository.deleteUser('81998644927');

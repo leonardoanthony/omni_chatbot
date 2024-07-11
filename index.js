@@ -8,12 +8,15 @@ import { slotmachine } from './src/modules/slotmachine/index.js';
 import { pokemon } from './src/modules/pokemon/index.js';
 import startConfigOptions from './src/config/startConfigOptions.js';
 import parseCommand from './src/config/parser/index.js';
-import { reactions } from './src/config/reactions.js';
+import { icons } from './src/config/icons.js';
+
+
 
 create(startConfigOptions()).then(client => start(client));
 
 function start(client) {
 
+  const { reactions } = icons;
 
   const handleMsg = (msgText, message) => {
       const parsedMessage = parseCommand(msgText);
@@ -117,10 +120,11 @@ ______
 
   client.onMessage(async message => {
     if (message.body.slice(0,7) === '!qrcode') {
+      await client.react(message.id, reactions.loading)
       const info = message.body.slice(8).trim();
 
       if(!info){
-        await client.react(message.id, '❌');
+        await client.react(message.id, reactions.error);
         await client.sendText(message.from, 'comando !qrcode sem parametro');
         return;
       }
@@ -128,6 +132,7 @@ ______
       const filePath = await qrcode(info);
       const senderNumber = message.author;
       const mention = `@${senderNumber.split('@')[0]}`;
+      await client.react(message.id, reactions.success);
       await client.sendImage(message.from, filePath, 'qrcode.png', `Gerado com sucesso ${mention}`)
       
       fs.unlink(filePath, () => {});
@@ -136,6 +141,7 @@ ______
 
   client.onMessage(async message => {
     if (message.body === '!pokemon' || message.body === '!pokémon') {
+      await client.react(message.id, reactions.loading)
       
       const senderNumber = message.author;
       const mention = `@${senderNumber.split('@')[0]}`;
@@ -143,6 +149,7 @@ ______
       
 
       const {image, id, name} = await pokemon();
+      await client.react(message.id, reactions.success)
       await client.sendImage(message.from, image, `${id}.png`, `#${id} - ${name} ${mention}`);
 
       
@@ -152,12 +159,15 @@ ______
 
   client.onMessage(async message => {
     if (message.body.slice(0,5) === '!cota') {
+      await client.react(message.id, reactions.loading)
       const cota = message.body.slice(6).trim().toUpperCase();
       if(cota == ''){
+        await client.react(message.id, reactions.error)
         await client.sendText(message.from, 'Preencha uma cota, exemplo: PETR4, ITSA4');
         return;
       }
       const response = await brapi(cota);
+      await client.react(message.id, reactions.success)
       await client.sendText(message.from, response);
     }
   });

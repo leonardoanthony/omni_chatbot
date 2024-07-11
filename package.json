@@ -12,6 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "@open-wa/wa-automate": "^4.71.14",
+    "dotenv": "^16.4.5",
+    "firebase": "^10.12.3",
     "node-fetch": "^3.3.2"
   }
 }
