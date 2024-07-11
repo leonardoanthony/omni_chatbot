@@ -1,11 +1,11 @@
 
 export class User {
-    constructor({id, name, mention }){
+    constructor({id, name, mention, coins = 0, profile = 'classic' }){
         this.id = id;
         this.name = name;
         this.mention = mention;
-        this.coins = 0;
-        this.profile = 'classic';
+        this.coins = coins;
+        this.profile = profile;
     }
 }
 

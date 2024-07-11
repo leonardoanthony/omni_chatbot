@@ -17,7 +17,7 @@ create(startConfigOptions()).then(client => start(client));
 
 function start(client) {
 
-  const { reactions } = icons;
+  const { reactions, profiles } = icons;
 
   const handleMsg = (msgText, message) => {
       const parsedMessage = parseCommand(msgText);
@@ -43,6 +43,37 @@ function start(client) {
           await client.sendText(message.from, 'Erro ao cadastrar');
         }
       }
+    }
+  });
+
+  client.onMessage(async message => {
+    if (message.body === '!info') {
+      
+        client.react(message.id, reactions.loading);
+
+        const controller = new UserController();
+
+        const result = await controller.getUser(message);
+
+        if(result.error){
+          await client.react(message.id, reactions.error);
+          await client.sendText(message.from, result.message, message.id);
+          return;
+        }
+
+       
+          await client.react(message.id, reactions.success);
+          await client.sendText(message.from, 
+            `______
+
+--- *!INFO* ----
+*Nome:* ${result.name}
+*Perfil:* ${profiles[result.profile]} ${result.profile}
+*Coins:* ₡ ${result.coins}
+
+______
+`);
+        
     }
   });
 
@@ -103,6 +134,16 @@ ______
 Jogue o famoso caça níqueis, se der 3 números iguais, você vence;
 _Exemplo_: 
 \`🎰\`
+
+______
+
+--- CADASTROS USUARIO ----
+Para funcionalidades avançadas
+_Exemplo_: 
+- Para cadastrar-se ( apenas no chat privado )
+\`!create _Seu Nome_\`
+- Para saber suas informações 
+\`!info\`
 
 ______
 
@@ -193,9 +234,35 @@ ______
 
   client.onMessage(async message => {
     if (message.body === '🎰') {
-      const result = slotmachine();
-      await client.sendText(message.from, result.result);
-      await client.sendText(message.from, (result.status) ? 'Parabéns' : 'Não foi dessa vez');
+
+      await client.react(message.id, reactions.loading);
+
+      const controller = new UserController();
+
+      const result = await controller.getUser(message);
+
+      if(result.error){ 
+        await client.react(message.id, reactions.error);
+        await client.sendText(message.from, 'Apenas usuários cadastrados podem jogar!');
+        return;
+      }
+
+      const slot = slotmachine();
+      await client.sendText(message.from, slot.result);
+
+      if(slot.status){
+        const premio = 50;
+        const newAmount = result.coins + premio;
+        await controller.setCoins(message, newAmount);
+        await client.react(message.id, reactions.success);
+        await client.sendText(message.from, '*Parabéns!* _+ ₡50_');
+      }else{
+        await client.react(message.id, reactions.error);
+        await client.sendText(message.from, 'Não foi dessa vez');
+      }
+
+
+
     }
   });
 

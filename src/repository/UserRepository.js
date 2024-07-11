@@ -25,7 +25,7 @@ export class UserRepository {
       if (userSnap.exists()) {
         return userSnap.data();
       } else {
-        console.log('No such user!');
+        return {error: true, message: 'Usuário não cadastrado'};
       }
     } catch (error) {
       console.error('Error reading user:', error);
