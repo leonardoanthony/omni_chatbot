@@ -17,7 +17,7 @@ create(startConfigOptions()).then(client => start(client));
 
 function start(client) {
 
-  const { reactions, profiles } = icons;
+  const { reactions, profiles, pokeTypes } = icons;
 
   const handleMsg = (msgText, message) => {
       const parsedMessage = parseCommand(msgText);
@@ -124,9 +124,11 @@ _Exemplo_:
 ______
 
 --- POKEMON ----
-Gere um Pokémon aleatório
+Gere um Pokémon
 _Exemplo_: 
-\`!pokemon\`
+\`!pokemon\`  para gerar um aleatório
+\`!pokemon types\`
+\`!pokemon pikachu\`
 
 ______
 
@@ -200,20 +202,43 @@ ______
   });
 
   client.onMessage(async message => {
-    if (message.body === '!pokemon' || message.body === '!pokémon') {
+    if (message.body.slice(0,8) === '!pokemon' || message.body.slice(0,8) === '!pokémon') {
       await client.react(message.id, reactions.loading)
       
       const senderNumber = message.author;
       const mention = `@${senderNumber.split('@')[0]}`;
 
-      
+      const search = message.body.slice(8).trim().toLowerCase();
 
-      const {image, id, name} = await pokemon();
-      await client.sendImage(message.from, image, `${id}.png`, `#${id} - ${name} ${mention}`);
+      const pokemonResponse = await pokemon(search);
+
+      if(pokemonResponse){
+        await client.sendText(message.from, `#404 - Not Fount`);
+        await client.react(message.id, reactions.error);
+        return 
+      }
+
+      const {image, id, name, types} = pokemonResponse;
+      
+      await client.sendImage(message.from, image, `${id}.png`, `#${id} - ${name} ${mention} - ${types}`);
       await client.react(message.id, reactions.success)
 
       
       fs.unlink(image, () => {});
+    }
+  });
+
+  client.onMessage(async message => {
+    if (message.body === '!pokemon types' || message.body === '!pokémon types') {
+      await client.react(message.id, reactions.loading)
+      
+      const response =  Object.entries(pokeTypes).map(([index, icon]) => {
+        return `*${index}:* ${icon}\n`;
+      }).join(` `);
+      
+      await client.sendText(message.from, response);
+      await client.react(message.id, reactions.success)
+
     }
   });
 

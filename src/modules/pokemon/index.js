@@ -3,22 +3,37 @@ import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { icons } from '../../config/icons.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export const pokemon = async () => {
-    const pokeID = Math.floor(Math.random() * 1026) + 1
-    const baseUrl = `https://pokeapi.co/api/v2/pokemon/${pokeID}`;
 
-    const pokemon = await (await fetch(baseUrl)).json();
+
+export const pokemon = async (name = '') => {
+    const pokeID = Math.floor(Math.random() * 1026) + 1
+    const baseUrl = `https://pokeapi.co/api/v2/pokemon/${name ? name : pokeID}`;
+
+    const {pokeTypes} = icons;
+
+    const result = await fetch(baseUrl);
+
+    if(result.ok){
+        return false;
+    }
+
+    const pokemon = await result.json();
+
+
+    const types = pokemon.types.map(typeInfo => pokeTypes[typeInfo.type.name]).join(' ');
 
     const fileImage = await dowloadPokemonImage(pokemon.sprites.other['official-artwork'].front_default, pokemon.id);
 
     const response = {
         id: pokemon.id,
         name: pokemon.name.charAt(0).toUpperCase() + pokemon.name.substring(1),
-        image: fileImage
+        image: fileImage,
+        types,
     }
 
     return response;
