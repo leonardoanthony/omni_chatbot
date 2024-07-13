@@ -11,16 +11,16 @@ const __dirname = dirname(__filename);
 
 
 export const pokemon = async (name = '') => {
-    const pokeID = Math.floor(Math.random() * 1026) + 1
-    const baseUrl = `https://pokeapi.co/api/v2/pokemon/${name ? name : pokeID}`;
+    const pokeID = Math.floor(Math.random() * 1302) + 1
+    const baseUrl = `https://pokeapi.co/api/v2/pokemon/${name == '' ? pokeID : name}`;
+
+    console.log(baseUrl);
 
     const {pokeTypes} = icons;
 
     const result = await fetch(baseUrl);
 
-    if(result.ok){
-        return false;
-    }
+    if(result.status == 404){return false;}
 
     const pokemon = await result.json();
 
@@ -36,6 +36,7 @@ export const pokemon = async (name = '') => {
         types,
     }
 
+    console.log('response', response);
     return response;
 }
 
@@ -50,5 +51,6 @@ async function dowloadPokemonImage(url, id){
     const filePath = resolve(__dirname, `${id}.png`);
 
     writeFileSync(filePath, buffer);
+    console.log('download', filePath);
     return filePath;
 }

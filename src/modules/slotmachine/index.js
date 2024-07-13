@@ -1,5 +1,4 @@
 export const slotmachine = () => {
-    // const colors = ['🟥','🟫','🟪','🟦','🟩','🟨','🟧','⬛','⬜'];
     const colors = ['0️⃣','1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣'];
     const selected = [];
 
@@ -18,7 +17,7 @@ export const slotmachine = () => {
 
 function todosIguais(arr) {
     if (arr.length === 0) {
-        return true; // Arrays vazios são considerados como tendo todos os elementos iguais
+        return true; 
     }
     
     const primeiroItem = arr[0];

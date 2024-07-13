@@ -1,6 +1,9 @@
+import 'dotenv/config';
+
 export const brapi = async (cota) => {
     const quote = cota.toUpperCase()
-    const url = `https://brapi.dev/api/quote/${quote}?token=ghqDkwLSVVnVhCcUCAnywe`;
+    const apikey = process.env.brapi_apikey;
+    const url = `https://brapi.dev/api/quote/${quote}?token=${apikey}`;
     const response = await (await fetch(url)).json();
 
     

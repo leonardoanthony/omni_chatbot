@@ -12,7 +12,6 @@ import { icons } from './src/config/icons.js';
 import { UserController } from './src/controllers/UserController.js';
 
 
-
 create(startConfigOptions()).then(client => start(client));
 
 function start(client) {
@@ -77,14 +76,6 @@ ______
     }
   });
 
-
-  client.onMessage(async message => {
-    if (message.body === 'Pai Aldo') {
-      client.react(message.id, '✋');
-      await client.sendText(message.from, '✋😞');
-    }
-  });
-
   
   client.onMessage(async message => {
     if (message.body === '!help') {
@@ -128,7 +119,6 @@ Gere um Pokémon
 _Exemplo_: 
 \`!pokemon\`  para gerar um aleatório
 \`!pokemon types\`
-\`!pokemon pikachu\`
 
 ______
 
@@ -154,19 +144,18 @@ ______
   });
 
 
-
   client.onMessage(async message => {
     if (message.body.slice(0,4) === '!cep' && message.body.length == 13) {
 
 
       await client.react(message.id, reactions.loading)
 
-      const cep = Number(message.body.slice(5));
-      if(isNaN(cep)){
+      const cep = message.body.slice(5);
+      if(isNaN(Number(cep))){
         await client.sendText(message.from, 'Apenas números');
         return;
       }
-      const endereco = await cepapi(cep);
+      const endereco = await cepapi(String(cep));
 
       if(endereco.erro){
         await client.react(message.id, reactions.error)
@@ -210,36 +199,45 @@ ______
 
       const search = message.body.slice(8).trim().toLowerCase();
 
+      if (search === 'types' || search === 'types') {
+        await client.react(message.id, reactions.loading)
+        
+        const response =  Object.entries(pokeTypes).map(([index, icon]) => {
+          return `*${index}:* ${icon}\n`;
+        }).join(` `);
+        
+        await client.sendText(message.from, response);
+        await client.react(message.id, reactions.success)
+        return;
+      }
+
+
       const pokemonResponse = await pokemon(search);
 
-      if(pokemonResponse){
+      console.log('pokemonResponse', pokemonResponse);
+
+      if(!pokemonResponse){
         await client.sendText(message.from, `#404 - Not Fount`);
         await client.react(message.id, reactions.error);
+        console.log('notfound');
         return 
       }
 
       const {image, id, name, types} = pokemonResponse;
       
+      console.log('image');
       await client.sendImage(message.from, image, `${id}.png`, `#${id} - ${name} ${mention} - ${types}`);
+      console.log('react');
       await client.react(message.id, reactions.success)
-
       
+      
+      console.log('delete');
       fs.unlink(image, () => {});
     }
   });
 
   client.onMessage(async message => {
-    if (message.body === '!pokemon types' || message.body === '!pokémon types') {
-      await client.react(message.id, reactions.loading)
-      
-      const response =  Object.entries(pokeTypes).map(([index, icon]) => {
-        return `*${index}:* ${icon}\n`;
-      }).join(` `);
-      
-      await client.sendText(message.from, response);
-      await client.react(message.id, reactions.success)
-
-    }
+    
   });
 
   client.onMessage(async message => {

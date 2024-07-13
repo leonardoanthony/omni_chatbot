@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export async function qrcode(message) {
-  const url = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(message)}`;
+  const url = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(message)}`;
 
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Failed to fetch the image. Status: ${response.status}`);

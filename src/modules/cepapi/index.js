@@ -1,5 +1,6 @@
 export const cepapi = async (cep) => {
     const url = `https://viacep.com.br/ws/${cep}/json/`;
+    console.log(url);
     const endereco = await (await fetch(url)).json();
 
     if(!endereco){
