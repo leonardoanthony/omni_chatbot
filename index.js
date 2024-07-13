@@ -289,6 +289,17 @@ ______
     }
   });
 
+  client.onMessage(async message => {
+    if (message.body.toLowerCase().trim() === 'pai aldo') {
+
+      
+      await client.sendContact(message.from, '558197518847@c.us');
+      await client.react(message.id, '✋');
+
+
+    }
+  });
+
 
 
 }
