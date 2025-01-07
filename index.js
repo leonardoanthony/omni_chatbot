@@ -25,25 +25,25 @@ function start(client) {
       }
   }
 
-  client.onMessage(async message => {
-    if (message.body.slice(0, 7) === '!create') {
-      if (message.isGroupMsg) {
-        await client.react(message.id, reactions.error);
-        await client.sendText(message.from, 'Usuários só podem ser cadastrados em um chat privado');
-      } else {
-        client.react(message.id, reactions.loading);
-        const controller = new UserController();
-        const result = await controller.createUser(message);
-        if (result) {
-          await client.react(message.id, reactions.success);
-          await client.sendText(message.from, 'Usuário cadastrado');
-        } else {
-          await client.react(message.id, reactions.error);
-          await client.sendText(message.from, 'Erro ao cadastrar');
-        }
-      }
-    }
-  });
+  // client.onMessage(async message => {
+  //   if (message.body.slice(0, 7) === '!create') {
+  //     if (message.isGroupMsg) {
+  //       await client.react(message.id, reactions.error);
+  //       await client.sendText(message.from, 'Usuários só podem ser cadastrados em um chat privado');
+  //     } else {
+  //       client.react(message.id, reactions.loading);
+  //       const controller = new UserController();
+  //       const result = await controller.createUser(message);
+  //       if (result) {
+  //         await client.react(message.id, reactions.success);
+  //         await client.sendText(message.from, 'Usuário cadastrado');
+  //       } else {
+  //         await client.react(message.id, reactions.error);
+  //         await client.sendText(message.from, 'Erro ao cadastrar');
+  //       }
+  //     }
+  //   }
+  // });
 
   client.onMessage(async message => {
     if (message.body === '!info') {
@@ -236,9 +236,7 @@ ______
     }
   });
 
-  client.onMessage(async message => {
-    
-  });
+
 
   client.onMessage(async message => {
     if (message.body.slice(0,5) === '!cota') {
