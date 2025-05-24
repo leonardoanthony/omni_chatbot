@@ -10,6 +10,7 @@ import startConfigOptions from './src/config/startConfigOptions.js';
 import parseCommand from './src/config/parser/index.js';
 import { icons } from './src/config/icons.js';
 import { UserController } from './src/controllers/UserController.js';
+import { Mistral } from '@mistralai/mistralai';
 
 
 create(startConfigOptions()).then(client => start(client));
@@ -167,6 +168,114 @@ ______
       await client.sendText(message.from, endereco);
       await client.react(message.id, reactions.success)
     }
+
+    if(message.body.slice(0,5) === '!food'){
+
+      await client.react(message.id, reactions.loading)
+      
+      const food = message.body.slice(5).trim();
+      
+      if(food == ''){
+        await client.react(message.id, reactions.error);
+        await client.sendText(message.from, 'Escreva um alimento');
+        return;
+      }
+
+      const apiKey = process.env.MISTRAL_API_KEY;
+
+      const bot = new Mistral({apiKey: apiKey});
+
+      const chatResponse = await bot.chat.complete({
+        model: 'mistral-small-latest',
+        messages: [
+          {
+            role: 'system',
+            content: `
+              Você é um assistente nutricional.
+              Sempre que o usuário mencionar um alimento, responda com uma FICHA TÉCNICA no seguinte formato (não explique nada, apenas retorne a ficha):
+
+              📄 FICHA TÉCNICA – [NOME DO ALIMENTO] (descrição, quantidade padrão)
+
+              🔋 Calorias: 🟨 [valor] kcal
+              💪 Proteínas: 🍗 [valor] g
+              ⚡ Gorduras totais: 🧈 [valor] g
+                • Saturadas: [valor] g
+                • Monoinsaturadas: [valor] g
+                • Poli-insaturadas: [valor] g
+              🥚 Colesterol: 🩺 [valor] mg
+              🌾 Carboidratos: 🟦 [valor] g
+              🧂 Sódio: [valor] mg
+
+              Substitua os valores com base no alimento informado. Mantenha os emojis e a formatação exatamente como no exemplo acima.
+                    `
+          },
+          {
+            role: 'user',
+            content: food
+          }
+        ],
+      });
+
+      await client.react(message.id, reactions.success);
+
+      console.log('Chat:', chatResponse.choices[0].message.content);
+
+      await client.sendText(message.from, chatResponse.choices[0].message.content);
+      }
+
+      if(message.body.slice(0,9) === '!training'){
+
+      await client.react(message.id, reactions.loading)
+      
+      const treino = message.body.slice(9).trim();
+      
+      if(treino == ''){
+        await client.react(message.id, reactions.error);
+        await client.sendText(message.from, 'Escreva um alimento');
+        return;
+      }
+
+      const apiKey = process.env.MISTRAL_API_KEY;
+
+      const bot = new Mistral({apiKey: apiKey});
+
+      const chatResponse = await bot.chat.complete({
+        model: 'mistral-small-latest',
+        messages: [
+          {
+            role: 'system',
+            content: `
+              Você é um assistente nutricional.
+              Sempre que o usuário mencionar um alimento, responda com uma FICHA TÉCNICA no seguinte formato (não explique nada, apenas retorne a ficha):
+
+              📄 FICHA TÉCNICA – [NOME DO ALIMENTO] (descrição, quantidade padrão)
+
+              🔋 Calorias: 🟨 [valor] kcal
+              💪 Proteínas: 🍗 [valor] g
+              ⚡ Gorduras totais: 🧈 [valor] g
+                • Saturadas: [valor] g
+                • Monoinsaturadas: [valor] g
+                • Poli-insaturadas: [valor] g
+              🥚 Colesterol: 🩺 [valor] mg
+              🌾 Carboidratos: 🟦 [valor] g
+              🧂 Sódio: [valor] mg
+
+              Substitua os valores com base no alimento informado. Mantenha os emojis e a formatação exatamente como no exemplo acima.
+                    `
+          },
+          {
+            role: 'user',
+            content: food
+          }
+        ],
+      });
+
+      await client.react(message.id, reactions.success);
+
+      console.log('Chat:', chatResponse.choices[0].message.content);
+
+      await client.sendText(message.from, chatResponse.choices[0].message.content);
+      }
   });
 
   client.onMessage(async message => {
