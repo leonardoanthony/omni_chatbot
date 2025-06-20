@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Ficha Técnica – Cenoura (100g crua)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 40px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 300px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h3 {
+      /* color: #f57c00; */
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    canvas {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h3>Ficha Técnica <br> <span id="alimento"></span> (<span id="quantidade"></span>)</h3>
+    <h4><span id="calorias_kcal"></span> calorias</h4>
+    <p class="subtitle">Proporção de Macronutrientes</p>
+    <canvas id="pizzaChart" width="200" height="200"></canvas>
+  </div>
+
+  <script>
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const alimento = decodeURIComponent(urlParams.get('alimento'));
+    const quantidade = decodeURIComponent(urlParams.get('quantidade'));
+    const calorias_kcal = decodeURIComponent(urlParams.get('calorias_kcal'));
+    const carboidratos_g = decodeURIComponent(urlParams.get('carboidratos_g'));
+    const proteinas_g = decodeURIComponent(urlParams.get('proteinas_g'));
+    const gorduras_totais_g = decodeURIComponent(urlParams.get('gorduras_totais_g'));
+
+
+    document.getElementById('alimento').innerHTML = alimento;
+    document.getElementById('calorias_kcal').innerHTML = calorias_kcal;
+    document.getElementById('quantidade').innerHTML = quantidade;
+
+    const ctx = document.getElementById('pizzaChart').getContext('2d');
+
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: [`Proteínas (${proteinas_g}g)`, `Gorduras Totais (${gorduras_totais_g}g)`, `Carboidratos (${carboidratos_g}g)`],
+        datasets: [{
+          data: [proteinas_g, gorduras_totais_g, carboidratos_g],
+          backgroundColor: [
+            '#4caf50', // proteínas
+            '#f44336', // gorduras
+            '#2196f3'  // carboidratos
+          ],
+          borderColor: '#fff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        animation: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          tooltip: {
+            callbacks: {
+              label: context => `${context.label}: ${context.parsed}g`
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

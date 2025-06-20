@@ -12,6 +12,9 @@ import { icons } from './src/config/icons.js';
 import { UserController } from './src/controllers/UserController.js';
 import { Mistral } from '@mistralai/mistralai';
 import { obterClimaWhatsapp } from './clima.js';
+import { generate_image_report } from './src/modules/report/index.js';
+
+import 'dotenv/config';
 
 
 create(startConfigOptions()).then(client => start(client));
@@ -439,6 +442,65 @@ function start(client) {
       return;
     
     }
+
+    if(message.body.slice(0,5) === '!food'){
+
+      await client.react(message.id, reactions.loading)
+      
+      const food = message.body.slice(5).trim();
+      
+      if(food == ''){
+        await client.react(message.id, reactions.error);
+        await client.sendText(message.from, 'Escreva um alimento');
+        return;
+      }
+
+      const apiKey = process.env.MISTRAL_API_KEY;
+
+      const bot = new Mistral({apiKey: apiKey});
+
+      const chatResponse = await bot.chat.complete({
+        model: 'mistral-small-latest',
+        messages: [
+          {
+            role: 'system',
+            content: `
+              Você é um assistente nutricional.
+              Sempre que o usuário mencionar um alimento, responda com uma FICHA TÉCNICA no seguinte formato (não explique nada, apenas retorne a ficha):
+              
+              {
+                "alimento": "[NOME DO ALIMENTO]",
+                "quantidade": "[quantidade padrão]",
+                "calorias_kcal": "[valor]",
+                "carboidratos_g": "[valor]",
+                "proteinas_g": "[valor]",
+                "gorduras_totais_g": "[valor]"
+              }
+
+              Substitua os valores com base no alimento informado. Mantenha a formatação exatamente como no exemplo acima.
+                    `
+          },
+          {
+            role: 'user',
+            content: food
+          }
+        ],
+      });
+
+      console.log(chatResponse.choices[0].message.content);
+      
+      // await client.sendText(message.from, chatResponse.choices[0].message.content);
+      
+      const json_ia_response = JSON.parse(chatResponse.choices[0].message.content);
+      
+      const image = await generate_image_report(json_ia_response);
+
+      await client.sendImage(message.from, image, `relatorio.png`, `${json_ia_response.alimento} - ${json_ia_response.quantidade}`);
+      await client.react(message.id, reactions.success);
+      
+      fs.unlink(image, () => {});
+
+      }
   });
 
 

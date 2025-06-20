@@ -16,6 +16,7 @@
     "axios": "^1.10.0",
     "dotenv": "^16.4.5",
     "firebase": "^10.12.3",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "puppeteer": "^24.10.2"
   }
 }
