@@ -500,7 +500,35 @@ function start(client) {
       
       fs.unlink(image, () => {});
 
+    }
+
+
+
+    if(message.body.slice(0,4) === '!n8n'){
+
+      await client.react(message.id, reactions.loading)
+      
+      const command = message.body.slice(4).trim();
+
+      console.log('command', command);
+
+      if(command == ''){
+        await client.react(message.id, reactions.error);
+        await client.sendText(message.from, 'Escreva um comando');
+        return;
       }
+
+      const url = 'your_n8n_webhook_url'; // Substitua pela URL do seu webhook n8n
+
+      const res = await fetch(`${url}?command=${command}`)
+      const data = await res.json();
+
+      console.log(data);
+        await client.react(message.id, reactions.success);
+        await client.sendText(message.from, `Comando enviado: ${command}`);
+
+
+    }
   });
 
 
