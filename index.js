@@ -13,6 +13,9 @@ import { UserController } from './src/controllers/UserController.js';
 import { Mistral } from '@mistralai/mistralai';
 import { obterClimaWhatsapp } from './clima.js';
 import { generate_image_report } from './src/modules/report/index.js';
+import puppeteer from "puppeteer";
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
 
 import 'dotenv/config';
 
@@ -155,8 +158,8 @@ function start(client) {
 
 //       await client.react(message.id, reactions.loading)
 
-//       const cep = message.body.slice(5);
-//       if(isNaN(Number(cep))){
+//       const cep = message.body.slice(6);
+//   imageif(isNaN(Number(cep))){
 //         await client.sendText(message.from, 'Apenas números');
 //         return;
 //       }
@@ -529,6 +532,39 @@ function start(client) {
 
 
     }
+    
+    if(message.body.slice(0,6) === '!image') {
+      try {
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = dirname(__filename);
+        const browser = await puppeteer.launch({ headless: 'new' });
+        const page = await browser.newPage();
+        await page.goto('https://webhook.atacama.digital/webhook/template', { waitUntil: 'networkidle0' });
+        const image = await page.screenshot({
+          clip: {
+            x: 175,
+            y: 0,
+            width: 450,
+            height: 550
+          }
+        });
+        const path_file = resolve(__dirname, 'relatorio.png')
+        fs.writeFileSync(path_file, image);
+        await browser.close();
+        await client.sendImage(message.from, path_file, `relatorio.png`,'');
+        fs.unlink(path_file, () => {});
+      } catch (error) {
+        console.error('Erro ao gerar imagem:', error);
+      }
+    }
+
+
+
+
+
+
+
+
   });
 
 
