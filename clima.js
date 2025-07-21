@@ -62,3 +62,7 @@ export async function obterClimaWhatsapp(cidade) {
     caption: mensagem
   };
 }
+
+
+
+// teste
